@@ -2878,7 +2878,7 @@ requires-dist = [
     { name = "nomad-hzb-emil", marker = "extra == 'plugins'", git = "https://github.com/nomad-hzb/nomad-hzb-emil.git" },
     { name = "nomad-lab", extras = ["dev", "infrastructure", "parsing"], marker = "extra == 'dev'", specifier = "==1.3.16" },
     { name = "nomad-lab", extras = ["infrastructure", "parsing"], specifier = "==1.3.16" },
-    { name = "plotly", specifier = "<6.0" },
+    { name = "plotly", specifier = "<7.0" },
     { name = "pyvis", marker = "extra == 'jupyter'" },
     { name = "seaborn", marker = "extra == 'jupyter'" },
     { name = "voila", marker = "extra == 'jupyter'" },
