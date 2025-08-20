@@ -21,7 +21,7 @@ readme = "README.md"
 requires-python = ">=3.10, <3.13"
 license = { file = "LICENSE" }
 dependencies = [
-  "nomad-lab[parsing, infrastructure]==1.3.16", 
+  "nomad-lab[parsing, infrastructure]==1.3.17rc2", 
   "plotly<6.0"
   ]
 
@@ -47,7 +47,7 @@ jupyter = [
 'jupyterlab>4.0',
 'seaborn',
 ]
-dev = ["nomad-lab[parsing, infrastructure, dev]==1.3.16"]
+dev = ["nomad-lab[parsing, infrastructure, dev]==1.3.17rc2"]
 
 [tool.uv]
 extra-index-url = [
