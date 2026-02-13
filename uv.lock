@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.10, <3.13"
 resolution-markers = [
     "python_version < '0'",
@@ -1782,16 +1782,16 @@ wheels = [
 
 [[package]]
 name = "jupyterlab-h5web"
-version = "12.3.0"
+version = "12.5.0"
 source = { registry = "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple" }
 dependencies = [
     { name = "h5grove" },
     { name = "h5py" },
     { name = "jupyter-server" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a0/06/44917ba842100a62794be927311048b77e8552f22e59191543d5c95a3924/jupyterlab_h5web-12.3.0.tar.gz", hash = "sha256:117686d4a5185c03f86d6ba1e5da9c51be170d5bc22f5dc930cb5d48a1d46150", size = 489131, upload-time = "2024-09-16T09:28:12.825Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ac/ca/72d705352d9a20c57edb9edd91ec6012a7eb5f707b65a77a0aac0c0d234f/jupyterlab_h5web-12.5.0.tar.gz", hash = "sha256:123772e16cb654fc3b807af5d80804e9f3622d1538d497ff19674034cb01c4ca", size = 491437, upload-time = "2025-09-22T07:49:25.699Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ce/db/5b410f50ee00907e401a56ba2b3e8d7e1e7a01918b1b0578780e516a9ea4/jupyterlab_h5web-12.3.0-py3-none-any.whl", hash = "sha256:75aafa5c622cd5882161ea4865acdefdbfa59eecea57a1bf3fa6d600297554af", size = 780164, upload-time = "2024-09-16T09:28:11.461Z" },
+    { url = "https://files.pythonhosted.org/packages/b5/3c/b12ee4a2db56b98e461ae936818a333e0cfb5e609765a1780c68f5c2706b/jupyterlab_h5web-12.5.0-py3-none-any.whl", hash = "sha256:83352599928d5a28b37f4ffdaf2c2ed8c1027695148c56b6032a297873d1dfff", size = 403194, upload-time = "2025-09-22T07:49:24.231Z" },
 ]
 
 [[package]]
