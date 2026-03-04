@@ -21,7 +21,7 @@ readme = "README.md"
 requires-python = ">=3.10, <3.13"
 license = { file = "LICENSE" }
 dependencies = [
-  "nomad-lab[parsing, infrastructure]==1.4.1.rc2",
+  "nomad-lab[parsing, infrastructure]==1.4.1",
   "setuptools",
   "plotly<6.0"
   ]
@@ -33,6 +33,12 @@ repository = "https://github.com/nomad-hzb/hzb-emil-image"
 plugins = [
   'nomad-baseclasses @ git+https://github.com/nomad-hzb/nomad-baseclasses.git',
   'nomad-hzb-emil @ git+https://github.com/nomad-hzb/nomad-hzb-emil.git',
+  "pynxtools==0.12.0",
+  "pynxtools-ellips>=0.1.1",
+  "pynxtools-em>=0.4.2",
+  "pynxtools-raman>=0.1.1",
+  "pynxtools-xps>=0.5.4",
+  "pynxtools-xrd>=0.0.7",
 ]
 jupyter = [
 'voila',
@@ -48,13 +54,13 @@ jupyter = [
 'jupyterlab>4.0',
 'seaborn',
 ]
-dev = ["nomad-lab[parsing, infrastructure, dev]==1.4.1rc2"]
+dev = ["nomad-lab[parsing, infrastructure, dev]==1.4.1"]
 
 [tool.uv]
 extra-index-url = [
   "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple",
 ]
-constraint-dependencies = ["hyperspy>=1.7.6"]
+constraint-dependencies = ["flatdict>=4.1.0","hyperspy>=1.7.6"]
 prerelease = "allow"
 
 [tool.setuptools.packages.find]
