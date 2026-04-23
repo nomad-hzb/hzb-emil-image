@@ -21,7 +21,7 @@ readme = "README.md"
 requires-python = ">=3.10, <3.13"
 license = { file = "LICENSE" }
 dependencies = [
-  "nomad-lab[parsing, infrastructure]==1.4.1",
+  "nomad-lab[parsing, infrastructure]==1.4.2",
   "setuptools",
   "plotly<6.0"
   ]
@@ -54,13 +54,13 @@ jupyter = [
 'jupyterlab>4.0',
 'seaborn',
 ]
-dev = ["nomad-lab[parsing, infrastructure, dev]==1.4.1"]
+dev = ["nomad-lab[parsing, infrastructure, dev]==1.4.2"]
 
 [tool.uv]
 extra-index-url = [
   "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple",
 ]
-constraint-dependencies = ["flatdict>=4.1.0","hyperspy>=1.7.6"]
+constraint-dependencies = ["flatdict>=4.1.0","hyperspy>=1.7.6", , "pyzmq==27.0.2"]
 prerelease = "allow"
 
 [tool.setuptools.packages.find]
