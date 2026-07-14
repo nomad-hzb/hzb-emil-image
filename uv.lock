@@ -3115,8 +3115,9 @@ provides-extras = ["plugins", "jupyter", "dev"]
 [[package]]
 name = "nomad-hzb-emil"
 version = "0.1.0"
-source = { git = "https://github.com/nomad-hzb/nomad-hzb-emil.git#150a42c3514b44fed051127a0f2a5a5e0d68d97a" }
+source = { git = "https://github.com/nomad-hzb/nomad-hzb-emil.git#1057489d48f402d092bb7536889efda7c655be2e" }
 dependencies = [
+    { name = "nomad-baseclasses" },
     { name = "nomad-lab" },
     { name = "python-magic-bin", marker = "sys_platform == 'win32'" },
 ]
