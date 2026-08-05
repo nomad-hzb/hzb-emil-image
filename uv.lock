@@ -3519,7 +3519,7 @@ provides-extras = ["plugins", "jupyter", "dev"]
 [[package]]
 name = "nomad-hzb-emil"
 version = "0.1.0"
-source = { git = "https://github.com/nomad-hzb/nomad-hzb-emil.git#c00203f8b2adda12a3c802e640f835d9c6ea9777" }
+source = { git = "https://github.com/nomad-hzb/nomad-hzb-emil.git#89a2edfd5e600742cb25da6eaa7629f606216a88" }
 dependencies = [
     { name = "nomad-baseclasses" },
     { name = "nomad-lab" },
