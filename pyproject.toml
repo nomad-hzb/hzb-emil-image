@@ -30,6 +30,7 @@ dependencies = [
 repository = "https://github.com/nomad-hzb/hzb-emil-image"
 
 [project.optional-dependencies]
+# Add your plugins to the list below.
 plugins = [
   'nomad-baseclasses @ git+https://github.com/nomad-hzb/nomad-baseclasses.git',
   'nomad-hzb-emil @ git+https://github.com/nomad-hzb/nomad-hzb-emil.git',
@@ -39,6 +40,7 @@ plugins = [
   "pynxtools-raman>=0.1.1",
   "pynxtools-xps>=0.5.4",
   "pynxtools-xrd>=0.0.7",
+  "nomad-north-jupyter>=0.2.6",
 ]
 jupyter = [
 'voila',
@@ -53,9 +55,13 @@ jupyter = [
 'jupyterlab_h5web',
 'jupyterlab>4.0',
 'seaborn',
-'ipykernel<7','ipython<9'
+'ipykernel<7',
+'ipython<9',
+'jupyter-events',
 ]
 dev = ["nomad-lab[parsing, infrastructure, dev]==1.4.3"]
+gpu-action = []
+cpu-action = []
 
 [tool.uv]
 extra-index-url = [

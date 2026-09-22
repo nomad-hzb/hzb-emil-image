@@ -1,3 +1,5 @@
+.env.north
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -162,3 +164,6 @@ cython_debug/
 
 # TLS certificates
 tls/
+
+# Pycharm
+.idea/
