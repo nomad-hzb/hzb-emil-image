@@ -41,6 +41,7 @@ plugins = [
   "pynxtools-xps>=0.5.4",
   "pynxtools-xrd>=0.0.7",
   "nomad-north-jupyter>=0.2.6",
+  "nomad-north-voila",
 ]
 jupyter = [
 'voila',
