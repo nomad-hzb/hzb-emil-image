@@ -4165,7 +4165,7 @@ wheels = [
 [[package]]
 name = "nomad-baseclasses"
 version = "1.0.1"
-source = { git = "https://github.com/nomad-hzb/nomad-baseclasses.git#65b4ecdd8e96607c33febf74d091ecfa42a426fb" }
+source = { git = "https://github.com/nomad-hzb/nomad-baseclasses.git#66740bafed0b2857ae50f122dd6e2999d29d3bd1" }
 dependencies = [
     { name = "chardet" },
     { name = "hdf5plugin" },
@@ -4259,7 +4259,7 @@ provides-extras = ["plugins", "jupyter", "dev", "gpu-action", "cpu-action"]
 [[package]]
 name = "nomad-hzb-emil"
 version = "0.1.0"
-source = { git = "https://github.com/nomad-hzb/nomad-hzb-emil.git#0e3f1703d6fba28ed13a1080a21151ecac0b14ad" }
+source = { git = "https://github.com/nomad-hzb/nomad-hzb-emil.git#3875ead32cee5282e108b420710ceea8eed9ff0e" }
 dependencies = [
     { name = "nomad-baseclasses" },
     { name = "nomad-lab" },
