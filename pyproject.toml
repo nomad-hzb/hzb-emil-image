@@ -61,7 +61,7 @@ jupyter = [
 'ipython<9',
 'jupyter-events',
 ]
-dev = ["nomad-lab[parsing, infrastructure, dev]==1.4.3"]
+#dev = ["nomad-lab[parsing, infrastructure, dev]==1.4.3"]
 gpu-action = []
 cpu-action = []
 
