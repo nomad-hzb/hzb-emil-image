@@ -1,6 +1,19 @@
 services:
-  api_host: "localhost"
-  api_base_path: "/nomad-oasis"
+  # api_host: "localhost"
+  api_port: 80
+  api_base_path: "/backend"
+  upload_limit: 1000
+  #admin_user_id: ""
+  upload_members_group_search_enabled: true
+  https: true
+
+#fs:
+#  north_home_external: ""
+#  public_external: ""
+#  staging_external: ""
+
+#client:
+#  url: ""
 
 oasis:
   is_oasis: true
@@ -12,10 +25,28 @@ plugins:
       nomad_north_jupyter.north_tools:jupyter:
         north_tool:
           image: ghcr.io/nomad-hzb/hzb-emil-image/jupyter:main
+      nomad_north_voila.north_tools:voila:
+        north_tool:
+          image: ghcr.io/fairmat-nfdi/nomad-north-voila:main
+  # We only include our schema here. Without the explicit include, all plugins will be
+  # loaded. Many build in plugins require more dependencies. Install nomad-lab[parsing]
+  # to make all default plugins work.
+    include: [
+    "nomad_hzb_emil.schema_packages:tfc_schema_package",
+    "nomad_hzb_emil.schema_packages:hzb_emil_package_entry_point",
+    "nomad_hzb_emil.parsers:prevac_sputtering_parser",
+    "nomad_hzb_emil.parsers:tfc_xrf_parser",
+    "nomad_hzb_emil.parsers:emil_general_process_parser",
+    "nomad_hzb_emil.apps:hzb_eln_app",
+    "nomad_hzb_emil.apps:emil_lab_voila_app",
+    "nomad_hzb_emil.apps:emil_eln_app",
+    "nomad_hzb_emil.apps:scala_eln_app",
+    "nomad_north_jupyter.north_tools:jupyter",
+    "nomad_north_voila.north_tools:voila",
+    ]
 
 meta:
   deployment: "oasis"
-  deployment_url: "https://my-oasis.org/api"
   maintainer_email: "me@my-oasis.org"
 
 logstash:

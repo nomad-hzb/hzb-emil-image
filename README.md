@@ -1,23 +1,8 @@
-![docker image](https://github.com/{{ repository }}/actions/workflows/docker-publish.yml/badge.svg)
+![docker image](https://github.com/nomad-hzb/hzb-emil-image/actions/workflows/docker-publish.yml/badge.svg)
 
-{% if include_template_section == "true" -%}
-# NOMAD Oasis Distribution *Template*
-This repository is a template for creating your own custom NOMAD Oasis distribution image.
-Click [here](https://github.com/new?template_name=nomad-distro-template&template_owner=FAIRmat-NFDI)
-to use this template, or click the `Use this template` button in the upper right corner of
-the main GitHub page for this template.
+# nomad-hzb's NOMAD Oasis Distribution
 
-> [!CAUTION]
-> The templated repository will run a GitHub action on creation which might take a few minutes.
-> After the workflow finishes you should refresh the page and this message should disappear.
-> If this message persists you might need to trigger the workflow manually by navigating to the
-> "Actions" tab at the top, clicking "Template Repository Initialization" on the left side,
-> and triggering it by clicking "Run workflow" under the "Run workflow" button on the right.
-
-{% endif -%}
-# {{ repository_owner }}'s NOMAD Oasis Distribution
-
-This is the NOMAD Oasis distribution of {{ repository_owner }}.
+This is the NOMAD Oasis distribution of nomad-hzb.
 Below are instructions for how to [deploy this distribution](#deploying-the-distribution)
 and how to customize it through [adding plugins](#adding-a-plugin).
 
@@ -65,16 +50,16 @@ This section covers the minimal steps for getting an Oasis running locally. Note
 2. Clone the repository or download the repository as a zip file.
 
     ```sh
-    git clone https://github.com/{{ repository }}.git
-    cd {{ repository_name }}
+    git clone https://github.com/nomad-hzb/hzb-emil-image.git
+    cd hzb-emil-image
     ```
 
     or
 
     ```sh
-    curl -L -o {{ repository_name }}.zip "https://github.com/{{ repository }}/archive/main.zip"
-    unzip {{ repository_name }}.zip
-    cd {{ repository_name }}
+    curl -L -o hzb-emil-image.zip "https://github.com/nomad-hzb/hzb-emil-image/archive/main.zip"
+    unzip hzb-emil-image.zip
+    cd hzb-emil-image
     ```
 
 3. _On Linux only,_ recursively change the owner of the `.volumes` directory to the nomad user (1000)
@@ -129,10 +114,12 @@ This section covers the minimal steps for getting an Oasis running locally. Note
 7. (Optional) You can now test that NOMAD is running with
 
     ```sh
-    curl localhost/nomad-oasis/alive
+    curl localhost/backend/alive
     ```
 
-8. Finally, open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser to start using your new NOMAD Oasis.
+8. Finally, open [http://localhost](http://localhost) in your browser to start using your new NOMAD Oasis.
+
+   The GUI is served from the root path, while the NOMAD API and other backend services live under `/backend` (e.g. `http://localhost/backend/api/v1`). Links using the former `/nomad-oasis` base path are redirected automatically.
 
 You can find more details on setting up and maintaining an Oasis in the NOMAD docs here: [https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/configure.html](https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/configure.html)
 
@@ -145,32 +132,39 @@ Before you can host your Oasis securely under a domain, you will have to go thro
 
    In production, your Oasis will be available under a domain name of your choice. This means that in some DNS server there is a record that points a domain name to your Oasis IP address.
 
-   Once this domain name is available, you also need to configure it in the NOMAD Oasis configuration. This can be done by adding the `services.api_host` field into your `nomad.yaml` (the default configuration is stored in `configs/nomad.yaml`). If your Oasis is available under the address `https://mydomainname/nomad-oasis`, you need to set it up like this:
+   Once this domain name is available, it needs to be configured in a few places. The examples below assume that your Oasis is available under `oasis.example.org`:
 
-   ```yaml
-   services:
-     api_host: mydomainname
-   ```
+   1. In the NOMAD configuration, set the `services.api_host` field in `configs/nomad.yaml`. Use only the host name (including any subdomain), without `https://` or a path:
 
-   Note that if your Oasis uses a subdomain like `https://mydomainname/mysubdomain/nomad-oasis`, you need to include that subdomain as well:
+      ```yaml
+      services:
+        api_host: oasis.example.org
+      ```
 
-   ```yaml
-   services:
-     api_host: mydomainname/mysubdomain
-   ```
+      Note that `configs/nomad.yaml` is built into the NOMAD image. For the change to take effect, either commit and push it so that a new image is built, or mount your local file into every running NOMAD service by uncommenting the `./configs/nomad.yaml:/app/nomad.yaml` line under `x-nomad-base.volumes` in `docker-compose.yaml`.
+
+   2. In `docker-compose.yaml`, update the login callback URL of the `north` service:
+
+      ```yaml
+      OAUTH_CALLBACK_URL: "http://oasis.example.org/backend/north/hub/oauth_callback"
+      ```
+
+      Once you enable HTTPS (see the next step), this URL must use `https://` instead.
 
 2. Configuring Secure HTTP and HTTPS Connections
 
    By default `docker-compose.yaml` uses the HTTP protocol for communication. This works for testing, but before entering production you must secure your setup with HTTPS; otherwise, any communication with the server-including credentials and sensitive data-can be compromised.
 
-   The first step is to add a configuration to your `nomad.yaml` (the default configuration is stored in `configs/nomad.yaml`) that makes sure that HTTPS protocol is by the links that the platform creates:
+   The first step is to add a configuration to your `nomad.yaml` (the default configuration is stored in `configs/nomad.yaml`) that makes sure that HTTPS protocol is used by the links that the platform creates:
 
    ```yaml
    services:
      https: true
    ```
 
-   The second step is to setup a TLS certificate. This certificate also needs to be
+   Also change the `OAUTH_CALLBACK_URL` of the `north` service in `docker-compose.yaml` to use `https://`, e.g. `https://oasis.example.org/backend/north/hub/oauth_callback`.
+
+   The second step is to setup a TLS certificate. The certificate must be issued for your Oasis host name, and it also needs to be
    renewed periodically. Depending on your setup, you have several options:
 
    1. You already have a certificate.
@@ -193,6 +187,8 @@ Before you can host your Oasis securely under a domain, you will have to go thro
         -out ./tls/selfsigned.crt \
         -subj "/CN=localhost"
       ```
+
+      When testing under your own host name, replace `localhost` in the `CN` with it, e.g. `-subj "/CN=oasis.example.org"`.
 
    To start using a TLS certificate, update the `proxy` configuration in `docker-compose.yml`:
    ```diff
@@ -260,12 +256,11 @@ Please see the [Jupyter image](#the-jupyter-image) section below for more inform
 
 ### For an existing Oasis
 
-If you already have an Oasis running you only need to change the image being pulled in
-your `docker-compose.yaml` with `ghcr.io/{{ image_name }}:main` for the services
-`worker`, `app`, `north`, and `logtransfer`.
+If you already have an Oasis running you only need to change the image in
+`docker-compose.yaml` (either by setting `APP_IMAGE` in your `.env` or updating `x-images.nomad` in `docker-compose.yaml`) with `ghcr.io/nomad-hzb/hzb-emil-image:main`.
 
 If you want to use the `nomad.yaml` from this repository you also need to comment out
-the inclusion of the `nomad.yaml` under the volumes key of those services in the
+the inclusion of the `nomad.yaml` under the volumes key of `x-nomad-base` in
 `docker-compose.yaml`.
 
 ```yaml
@@ -308,7 +303,7 @@ A minimal `values.yaml` for single-node clusters (Minikube, Kind, k3s, etc.) is 
     kubectl port-forward svc/nomad-oasis-proxy 80:80
     ```
 
-    Then open [http://localhost/nomad-oasis](http://localhost/nomad-oasis) in your browser.
+    Then open [http://localhost](http://localhost) in your browser.
 
 > [!NOTE]
 > **Secrets:** The API secret is auto-generated by default. For production, you can
@@ -435,7 +430,7 @@ Note that the `base-notebook` image is more lightweight and uses less disk space
 The image is quite large and might cause a timeout the first time it is run. In order to avoid this you can pre pull the image with:
 
 ```sh
-docker pull ghcr.io/{{ image_name }}/jupyter:main
+docker pull ghcr.io/nomad-hzb/hzb-emil-image/jupyter:main
 ```
 
 If you want additional python packages to be available to all users in the jupyter hub you can add those to the jupyter table in the [`pyproject.toml`](pyproject.toml):
@@ -477,13 +472,28 @@ This automated process helps ensure that your dependencies stay up to date, impr
 
 ## Customizing Documentation
 
-By default, documentation is built using the [nomad-docs](https://github.com/FAIRmat-NFDI/nomad-docs) repository. However, if you'd like to customize the documentation for your Oasis instance, you can easily do so.
+By default, no documentation is built into the Oasis image. Instead, links to the official, versioned NOMAD documentation at [https://docs.nomad-lab.eu](https://docs.nomad-lab.eu) will be used. However, if you'd like to serve customized documentation from your Oasis instance, and change the GUI links to lead to them, you can follow these steps:
 
 1. First, [fork the nomad-docs repository](https://github.com/FAIRmat-NFDI/nomad-docs/fork).
 2. Make your desired changes in your fork.
-3. Update the `NOMAD_DOCS_REPO` variable in the [.github/workflows/docker-publish.yml](./.github/workflows/docker-publish.yml#L19) file to point to the URL of your forked repository.
+3. In the [.github/workflows/docker-publish.yml](./.github/workflows/docker-publish.yml#L19) file, set **both** of the following variables:
+   - `NOMAD_DOCS_REPO`: the URL of your forked repository.
+   - `NOMAD_DOCS_REPO_REF`: the branch, tag, or commit to build, e.g. the tag matching your `nomad-lab` version.
+4. In your `nomad.yaml`, change the documentation URL to point to the `/docs` subpath of your Oasis:
 
-This setup ensures that your custom documentation is used when building your Oasis.
+   ```yaml
+   documentation:
+     url: '<your-public-oasis-url>/docs`
+   ```
+
+The documentation is only built when both variables are set, and is then served under `/docs` on your Oasis. When building the image locally, you can pass the same values as build arguments:
+
+```sh
+docker build \
+  --build-arg NOMAD_DOCS_REPO=https://github.com/<your-org>/nomad-docs.git \
+  --build-arg NOMAD_DOCS_REPO_REF=<branch-tag-or-commit> \
+  .
+```
 
 ## Backing up the Oasis
 
@@ -576,18 +586,87 @@ Ideally all workflows should be triggered automatically but you might need to ru
 
 ## Migration steps
 
-Sometimes there are significant changes in these distribution templates, and you will be required to take additional action upon updating to a newer version. This list keeps track of the biggest changes that require additional steps beyond just updating the template code/files.
+Sometimes there are significant changes in these distribution templates, and you will be required to take additional action upon updating to a newer version.
 
- - **v1.4.2**: MongoDB image was migrated from v5.0.6 to v8.x. This requires an additional step of migrating the existing MongoDB data into this new version. We provide [a helper script](https://gitlab.mpcdf.mpg.de/nomad-lab/nomad-FAIR/-/snippets/188/raw/main/upgrade_mongo.py) that will aid you in doing this migration. Before doing the migration, it is key that you **backup your existing MongoDB data**. Our script does the backup automatically, but you should ensure that the backup files are created successfully. Read through the script to understand the different steps, and then run it on your Docker host machine (Python>=3.8 is required) like this, adjusting parameters as needed:
+For detailed migration instructions, please refer to the [NOMAD Oasis Migration Guide](https://docs.nomad-lab.eu/howto/oasis/migrate.html).
 
-    ```
-    curl -O https://gitlab.mpcdf.mpg.de/nomad-lab/nomad-FAIR/-/snippets/188/raw/main/upgrade_mongo.py && \
-    python3 upgrade_mongo.py -c nomad_oasis_mongo -f docker-compose.yaml --from-version 5.0.6
-    ```
+For the migration from NOMAD 1.4.3 to 2.0, `docker-compose.es7.yaml` provides a temporary
+Elasticsearch 7 service alongside the Elasticsearch 9 service in `docker-compose.yaml`.
+Use both files only during direct index migration, following the
+[NOMAD 2.0 migration guide](https://docs.nomad-lab.eu/howto/oasis/migrate/v2.0.html).
+Rebuilding the search index from MongoDB and archive files does not require this overlay.
 
 ## FAQ/Trouble shooting
 
-- _I get an_ `Error response from daemon: Head "https://ghcr.io/v2/{{ image_name }}/manifests/main": unauthorized` _when trying to pull my docker image._
+<details>
+<summary>MongoDB refuses to start on newer Linux kernels</summary>
+
+If the `mongo` container fails to start, check its logs:
+
+```sh
+docker compose logs mongo
+```
+
+The following message indicates a known incompatibility between MongoDB's
+TCMalloc allocator and newer Linux kernels:
+
+```text
+MongoDB cannot start: Linux kernel versions 6.19 and newer has a known incompatibility with this version of MongoDB.
+```
+
+Containers use the kernel of their Linux host (or the Linux VM provided by your
+container runtime on macOS/Windows). Changing the NOMAD image does not change
+that kernel. The Oasis administrator must apply the appropriate workaround:
+
+1. **Prefer updating the host or container-runtime VM kernel.** According to
+   [MongoDB's platform support notes](https://www.mongodb.com/docs/manual/administration/production-notes/#platform-support-notes),
+   the kernel incompatibility affects versions 6.19 through 7.0.13 and is resolved
+   in 7.0.14 and later. However, some MongoDB versions may still reject newer
+   kernels: [issue #245](https://github.com/FAIRmat-NFDI/nomad-distro-template/issues/245)
+   reports MongoDB 8.0.28 refusing to start on kernel 7.1.5. If this happens, try
+   the environment-variable workaround below.
+
+2. **If updating the kernel is not possible or MongoDB still refuses to start,**
+   add this entry to the existing `mongo.environment` list in `docker-compose.yaml`,
+   keeping the other entries:
+
+   ```yaml
+   services:
+     mongo:
+       environment:
+         - MONGO_DATA_DIR=/data/db
+         - MONGO_LOG_DIR=/dev/null
+         - GLIBC_TUNABLES=glibc.pthread.rseq=1
+   ```
+
+   This [reported workaround](https://miliucci.org/post/mongodb-tcmalloc-rseq/)
+   may reduce performance. Recreate the container to apply it, then check the logs:
+
+   ```sh
+   docker compose up -d --force-recreate mongo
+   docker compose logs mongo
+   ```
+
+> [!WARNING]
+> **Development-only fallback:** MongoDB `docker.io/mongo:8.0.4` has also been
+> reported to start on affected kernels, but this old version has known security
+> vulnerabilities (see the [8.0.5 release notes](https://www.mongodb.com/docs/v8.0/release-notes/8.0/#8.0.5---feb-20--2025)).
+> Do not use it in production or downgrade an existing Oasis database in place.
+> If needed for a disposable local test, change only the `mongo` service's `image`
+> to `docker.io/mongo:8.0.4` and use a separate, empty data volume.
+
+The template already uses the floating `docker.io/mongo:8.0` tag. Pulling it with
+`docker compose pull mongo` obtains the latest available 8.0 patch, but a newer
+patch is not a confirmed fix for this issue. Check the upstream
+[MongoDB issue](https://jira.mongodb.org/browse/SERVER-121912) and
+[template issue #245](https://github.com/FAIRmat-NFDI/nomad-distro-template/issues/245)
+for updates before removing a workaround or changing MongoDB major versions.
+
+</details>
+
+### Pulling the distribution image
+
+- _I get an_ `Error response from daemon: Head "https://ghcr.io/v2/nomad-hzb/hzb-emil-image/manifests/main": unauthorized` _when trying to pull my docker image._
 
    Most likely you have not made the package public or provided a personal access token (PAT).
 You can read how to make your package public in the GitHub docs [here](https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility)
