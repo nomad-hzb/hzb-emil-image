@@ -35,8 +35,8 @@ x-nomad-base: &nomad-base
       condition: service_healthy
   volumes:
     # Uncomment the following line to mount a local nomad.yaml into all NOMAD services:
-    # - ./configs/nomad.yaml:/app/nomad.yaml
-    - ./.volumes/fs:/app/.volumes/fs
+    - ./configs/nomad.yaml:/app/nomad.yaml
+    - ${NOMAD_VOLUMES:-.}/.volumes/fs:/app/.volumes/fs
 
 # Base configuration for standard NOMAD services using the default nomad image (app and internal worker)
 x-nomad-service: &nomad-service
@@ -72,13 +72,32 @@ x-temporal-admin: &temporal-admin
   entrypoint: ["/bin/sh", "/scripts/_setup_temporal.sh"]
 
 services:
+  # ASCEND mqtt listener
+  mqtt-listener:
+    build:
+      context: ./mqtt-listener
+      args:
+        HTTP_PROXY: ${http_proxy}
+        HTTPS_PROXY: ${https_proxy}
+        NO_PROXY: ${no_proxy}
+    container_name: mqtt-listener
+    restart: unless-stopped
+    env_file:
+      - ./mqtt-listener/credentials.env
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   # the search engine
   elastic:
     restart: unless-stopped
     image: docker.elastic.co/elasticsearch/elasticsearch:9.5.0
     container_name: nomad_oasis_elastic_9
     environment:
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g -Dhttps.proxyHost=${PROXY_HOST} -Dhttps.proxyPort=${PROXY_PORT} -Dhttps.nonProxyHosts=localhost|127.0.0.1|elastic
+      #- ES_JAVA_OPTS=-Xms512m -Xmx512m -Dhttps.proxyHost=${PROXY_HOST} -Dhttps.proxyPort=${PROXY_PORT} -Dhttps.nonProxyHosts=localhost|127.0.0.1|elastic
       - discovery.type=single-node
       - xpack.security.enabled=false
     volumes:
@@ -105,7 +124,7 @@ services:
       - MONGO_LOG_DIR=/dev/null
     volumes:
       - mongo:/data/db
-      - ./.volumes/mongo:/backup
+      - ${NOMAD_VOLUMES:-.}/.volumes/mongo:/backup
     command: mongod --logpath=/dev/null # --quiet
     healthcheck:
       test:
@@ -197,11 +216,11 @@ services:
     command: python -m nomad.cli admin run action-internal-worker
     healthcheck: *worker-healthcheck
     deploy:
-      replicas: 4
+      replicas: ${WORKER_REPLICA_COUNT:-4}
       resources:
         limits:
-          cpus: "4.0" # Maximum 4 CPU cores
-          memory: 8G # Maximum 8GB RAM
+          cpus: ${WORKER_MAX_CPU_COUNT:-"4.0"}
+          memory: ${WORKER_MAX_MEMORY:-8G}
 
   # nomad gpu worker (actions)
   # gpu_worker:
@@ -271,7 +290,7 @@ services:
     environment:
       NOMAD_API_URL: "http://app:8000/backend/api/v1"
       BASE_URL: "/backend/north/"
-      OAUTH_CALLBACK_URL: "http://localhost/backend/north/hub/oauth_callback"
+      OAUTH_CALLBACK_URL: "https://${NOMAD_SERVICES_API_HOST:-localhost}/backend/north/hub/oauth_callback"
       DOCKER_PREFIX: "nomad-oasis-north"
       DOCKER_NETWORK: "nomad_oasis_network"
     env_file:
@@ -318,11 +337,12 @@ services:
       - ./configs/nginx_base_conf:/etc/nginx/conf.d/nginx_base_conf:ro
       - ./configs/nginx_maps_conf:/etc/nginx/conf.d/nginx_maps_conf:ro
       # HTTP
-      - ./configs/nginx_http.conf:/etc/nginx/conf.d/default.conf:ro
+      # - ./configs/nginx_http.conf:/etc/nginx/conf.d/default.conf:ro
       # HTTPS (you need to have a TLS certificate)
-      # - ./configs/nginx_https.conf:/etc/nginx/conf.d/default.conf:ro
-      # - ./tls/selfsigned.crt:/etc/nginx/tls/mounted-nomad-oasis.crt:ro  # Path to your TLS certificate
-      # - ./tls/selfsigned.key:/etc/nginx/tls/mounted-nomad-oasis.key:ro  # Path to your TLS private key
+      - ./configs/nginx_https.conf:/etc/nginx/conf.d/default.conf:ro
+      - ${NOMAD_PROXY_CERTS_VOLUME}/certs/nginx-selfsigned.crt:/etc/nginx/tls/mounted-nomad-oasis.crt:ro  # Path to your TLS certificate
+      - ${NOMAD_PROXY_CERTS_VOLUME}/private/nginx-selfsigned.key:/etc/nginx/tls/mounted-nomad-oasis.key:ro  # Path to your TLS private key
+      - ${NOMAD_PROXY_CERTS_VOLUME}/:/etc/nginx/ssl/      # only in emil oasis to include snippets/ssl-params.conf;
     depends_on:
       app:
         condition: service_healthy
