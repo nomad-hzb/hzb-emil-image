@@ -5425,7 +5425,7 @@ wheels = [
 [[package]]
 name = "nomad-hzb-emil"
 version = "0.1.0"
-source = { git = "https://github.com/nomad-hzb/nomad-hzb-emil.git#84f0fe9b9b649974dfbf5cc6d0abdccdbe0f4b9f" }
+source = { git = "https://github.com/nomad-hzb/nomad-hzb-emil.git#37eb9d34ec2add3c5b58de1f4138246de860c2d9" }
 dependencies = [
     { name = "nomad-baseclasses" },
     { name = "nomad-lab" },
