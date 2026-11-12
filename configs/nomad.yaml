@@ -33,10 +33,10 @@ plugins:
   # to make all default plugins work.
     include: [
     "nomad_hzb_emil.schema_packages:tfc_schema_package",
-    "nomad_hzb_emil.schema_packages:hzb_emil_package_entry_point",
+    "nomad_hzb_emil.schema_packages:emil_package_entry_point",
     "nomad_hzb_emil.parsers:prevac_sputtering_parser",
     "nomad_hzb_emil.parsers:tfc_xrf_parser",
-    "nomad_hzb_emil.parsers:emil_general_process_parser",
+    "nomad_hzb_emil.parsers:emil_general_process_parser",     # fallback: must be always last option in parser list
     "nomad_hzb_emil.apps:hzb_eln_app",
     "nomad_hzb_emil.apps:emil_lab_voila_app",
     "nomad_hzb_emil.apps:emil_eln_app",
