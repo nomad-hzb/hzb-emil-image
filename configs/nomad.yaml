@@ -34,7 +34,9 @@ plugins:
     include: [
     "nomad_hzb_emil.schema_packages:tfc_schema_package",
     "nomad_hzb_emil.schema_packages:emil_package_entry_point",
+    "nomad_hzb_emil.schema_packages:se_aid_schema_package",
     "nomad_hzb_emil.parsers:prevac_sputtering_parser",
+    "nomad_hzb_emil.parsers:se_aid_xps_parser",
     "nomad_hzb_emil.parsers:tfc_xrf_parser",
     "nomad_hzb_emil.parsers:emil_general_process_parser",     # fallback: must be always last option in parser list
     "nomad_hzb_emil.apps:hzb_eln_app",
