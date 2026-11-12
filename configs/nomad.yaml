@@ -27,7 +27,7 @@ plugins:
           image: ghcr.io/nomad-hzb/hzb-emil-image/jupyter:main
       nomad_north_voila.north_tools:voila:
         north_tool:
-          image: ghcr.io/fairmat-nfdi/nomad-north-voila:main
+          image: ghcr.io/nomad-hzb/hzb-emil-image/jupyter:main
   # We only include our schema here. Without the explicit include, all plugins will be
   # loaded. Many build in plugins require more dependencies. Install nomad-lab[parsing]
   # to make all default plugins work.
